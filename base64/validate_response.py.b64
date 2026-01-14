@@ -1,0 +1,65 @@
+"""
+Pre-Response Validation
+Run this BEFORE Claude marks any task as COMPLETED
+"""
+
+import sys
+
+def validate_response():
+    """
+    Checklist that should run before every Claude response
+    """
+    checks = {
+        'searched_past_chats': False,
+        'checked_claude_md': False,
+        'verified_existing_solutions': False,
+        'tested_assumptions': False,
+        'reviewed_past_work': False
+    }
+    
+    print("=" * 60)
+    print("PRE-RESPONSE VALIDATION CHECKLIST")
+    print("=" * 60)
+    print()
+    
+    # Interactive checklist
+    print("Before responding, did you:")
+    print()
+    
+    response = input("1. Search past chats for similar problems? (y/n): ")
+    checks['searched_past_chats'] = response.lower() == 'y'
+    
+    response = input("2. Check CLAUDE.md for existing patterns? (y/n): ")
+    checks['checked_claude_md'] = response.lower() == 'y'
+    
+    response = input("3. Verify no existing solution already exists? (y/n): ")
+    checks['verified_existing_solutions'] = response.lower() == 'y'
+    
+    response = input("4. Test your assumptions before claiming? (y/n): ")
+    checks['tested_assumptions'] = response.lower() == 'y'
+    
+    response = input("5. Review past successful work on this topic? (y/n): ")
+    checks['reviewed_past_work'] = response.lower() == 'y'
+    
+    print()
+    print("=" * 60)
+    
+    all_passed = all(checks.values())
+    
+    if all_passed:
+        print("✅ ALL CHECKS PASSED - Proceed with response")
+    else:
+        print("❌ VALIDATION FAILED - Fix these issues:")
+        for check, passed in checks.items():
+            if not passed:
+                print(f"   - {check.replace('_', ' ').title()}")
+        print()
+        print("DO NOT RESPOND until all checks pass!")
+    
+    print("=" * 60)
+    
+    return all_passed
+
+if __name__ == '__main__':
+    if not validate_response():
+        sys.exit(1)
