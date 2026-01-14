@@ -1,0 +1,28 @@
+#!/bin/bash
+# Mandatory session initialization
+# Run BEFORE every Claude interaction
+
+echo "=============================================="
+echo "CLAUDE SESSION INITIALIZATION"
+echo "=============================================="
+echo ""
+
+# 1. Display CLAUDE.md summary
+echo "📋 Reading CLAUDE.md..."
+if [ -f "CLAUDE.md" ]; then
+    echo "✅ CLAUDE.md found"
+    echo ""
+    echo "KEY REMINDERS:"
+    grep -A 5 "## CRITICAL" CLAUDE.md | head -20
+    echo ""
+    echo "KNOWN ISSUES:"
+    grep -A 3 "## Known Issues" CLAUDE.md | head -10
+else
+    echo "❌ CLAUDE.md not found! Create it first."
+    exit 1
+fi
+
+echo ""
+echo "=============================================="
+echo "✅ Session initialized. Proceed with task."
+echo "=============================================="
