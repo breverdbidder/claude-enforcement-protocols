@@ -1,0 +1,41 @@
+#!/bin/bash
+# Prevent commits without validation
+
+echo "🔍 Running pre-commit validation..."
+
+# Check if CLAUDE.md exists
+if [ ! -f "CLAUDE.md" ]; then
+    echo "❌ CLAUDE.md not found in repository"
+    exit 1
+fi
+
+# Check if CLAUDE.md has been updated in last 7 days
+CLAUDE_MD_MODIFIED=$(git log -1 --format="%ai" CLAUDE.md 2>/dev/null)
+if [ -n "$CLAUDE_MD_MODIFIED" ]; then
+    SEVEN_DAYS_AGO=$(date -d '7 days ago' +%s 2>/dev/null || date -v-7d +%s)
+    LAST_MODIFIED=$(date -d "$CLAUDE_MD_MODIFIED" +%s 2>/dev/null || date -j -f "%Y-%m-%d %H:%M:%S %z" "$CLAUDE_MD_MODIFIED" +%s)
+    
+    if [ $LAST_MODIFIED -lt $SEVEN_DAYS_AGO ]; then
+        echo "⚠️  Warning: CLAUDE.md not updated in 7+ days"
+        echo "   Update it before committing (Friday review protocol)"
+        read -p "   Continue anyway? (y/n): " response
+        if [ "$response" != "y" ]; then
+            exit 1
+        fi
+    fi
+fi
+
+# Check for common anti-patterns in staged changes
+if git diff --cached | grep -q "we don't have\|no API\|can't access\|not available"; then
+    echo "❌ BLOCKED: Response contains claim about missing resources"
+    echo "   Did you:"
+    echo "   - Search past chats?"
+    echo "   - Check CLAUDE.md?"
+    echo "   - Verify the resource truly doesn't exist?"
+    read -p "   Continue anyway? (y/n): " response
+    if [ "$response" != "y" ]; then
+        exit 1
+    fi
+fi
+
+echo "✅ Pre-commit validation passed"
