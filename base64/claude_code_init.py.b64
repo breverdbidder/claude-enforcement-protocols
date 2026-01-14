@@ -1,0 +1,55 @@
+"""
+Claude Code Session Initializer
+Automatically loads CLAUDE.md context at session start
+"""
+
+import os
+import sys
+
+def load_claude_context():
+    """Load and display CLAUDE.md at session start"""
+    
+    if not os.path.exists('CLAUDE.md'):
+        print("❌ CLAUDE.md not found!")
+        print("   Create it first or run from repo root")
+        sys.exit(1)
+    
+    with open('CLAUDE.md', 'r') as f:
+        content = f.read()
+    
+    print("=" * 70)
+    print("CLAUDE.md CONTEXT LOADED")
+    print("=" * 70)
+    print()
+    
+    # Extract critical sections
+    sections = {
+        'CRITICAL REMINDERS': [],
+        'Known Issues': [],
+        'Anti-Patterns': [],
+        'Successful Patterns': []
+    }
+    
+    current_section = None
+    for line in content.split('\n'):
+        if line.startswith('## '):
+            section_name = line.replace('## ', '').strip()
+            if section_name in sections:
+                current_section = section_name
+        elif current_section and line.strip():
+            sections[current_section].append(line)
+    
+    # Display key sections
+    for section, lines in sections.items():
+        if lines:
+            print(f"\n📌 {section}:")
+            for line in lines[:5]:  # First 5 lines of each
+                print(f"   {line}")
+    
+    print()
+    print("=" * 70)
+    print("✅ Context loaded. Proceed with development.")
+    print("=" * 70)
+
+if __name__ == '__main__':
+    load_claude_context()
